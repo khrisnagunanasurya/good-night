@@ -1,0 +1,45 @@
+development:
+  :concurrency: 5
+  :queues:
+    - [critical, 3]
+    - [default, 2]
+    - [mailers, 2]
+    - [low, 1]
+
+test:
+  :concurrency: 5
+  :queues:
+    - [critical, 3]
+    - [default, 2]
+    - [mailers, 2]
+    - [low, 1]
+
+staging:
+  :concurrency: 10
+  :timeout: 8
+  :queues:
+    - [critical, 5]
+    - [default, 3]
+    - [mailers, 3]
+    - [low, 1]
+
+production:
+  :concurrency: 15
+  :timeout: 8
+  :pidfile: ./tmp/pids/sidekiq.pid
+  :logfile: ./log/sidekiq.log
+  :max_retries: 10
+
+  :queues:
+    - [critical, 7]
+    - [default, 5]
+    - [mailers, 5]
+    - [scheduled, 3]
+    - [low, 1]
+
+  :retry: true
+  :backtrace: 20
+
+  :poll_interval_average: 15
+
+:tag: "#{Rails.application.class.module_parent_name}-#{Rails.env}"

@@ -24,7 +24,7 @@ Rails.application.configure do
   end
 
   # Change to :null_store to avoid any caching.
-  config.cache_store = :memory_store
+  config.cache_store = :redis_cache_store, { url: ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } }
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
@@ -52,6 +52,9 @@ Rails.application.configure do
 
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
+
+  # Use Sidekiq as the job queue adapter
+  config.active_job.queue_adapter = :sidekiq
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
