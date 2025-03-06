@@ -54,6 +54,10 @@ group :development, :test do
   gem "rswag-specs", "~> 2.13"
 end
 
+group :test do
+  gem "database_cleaner-active_record"
+end
+
 group :development do
   gem "rswag-ui", "~> 2.13"
 end
