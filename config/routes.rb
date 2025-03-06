@@ -1,8 +1,10 @@
 require 'sidekiq/web'
 
 Rails.application.routes.draw do
-  mount Rswag::Ui::Engine => '/api-docs'
-  mount Rswag::Api::Engine => '/api-docs'
+  unless Rails.env.production?
+    mount Rswag::Ui::Engine => '/api-docs'
+    mount Rswag::Api::Engine => '/api-docs'
+  end
 
   mount Sidekiq::Web => '/sidekiq', constraints: SidekiqConstraint.new
 
