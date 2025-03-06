@@ -33,11 +33,38 @@ paths:
             schema:
               type: object
               properties:
-                followed_user_id:
+                target_user_id:
                   type: integer
                   description: ID of the user to be followed
               required:
-              - followed_user_id
+              - target_user_id
+  "/api/v1/users/{user_id}/relationships/{target_user_id}":
+    parameters:
+    - name: user_id
+      in: path
+      description: ID of the user who is unfollowing
+      required: true
+      schema:
+        type: integer
+    - name: target_user_id
+      in: path
+      description: ID of the target user who is followed
+      required: true
+      schema:
+        type: integer
+    delete:
+      summary: Unfollows a user
+      tags:
+      - Relationships
+      responses:
+        '204':
+          description: user unfollowed successfully
+        '422':
+          description: can't unfollow an unfollowed user
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors"
   "/api/v1/users":
     get:
       summary: Retrieves a list of users

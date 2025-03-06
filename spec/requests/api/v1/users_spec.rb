@@ -93,7 +93,7 @@ RSpec.describe 'API::V1::Users', type: :request do
       response '404', 'user not exists' do
         schema '$ref' => '#/components/schemas/errors'
 
-        let(:id) { 'non-existing' }
+        let(:id) { -1 }
 
         run_test! do |response|
           expect(response).to have_http_status(:not_found)
@@ -119,7 +119,7 @@ RSpec.describe 'API::V1::Users', type: :request do
       response '404', 'user not exists' do
         schema '$ref' => '#/components/schemas/errors'
 
-        let(:id) { 'non-existing' }
+        let(:id) { -1 }
 
         run_test! do |response|
           expect(response).to have_http_status(:not_found)
