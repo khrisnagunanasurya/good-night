@@ -74,6 +74,34 @@ RSpec.describe 'API::V1::Users', type: :request do
   path '/api/v1/users/{id}' do
     parameter name: :id, in: :path, type: :integer, description: 'User ID'
 
+    get 'Retrieve a user' do
+      tags 'Users'
+      produces 'application/json'
+
+      response '200', 'user exists' do
+        schema '$ref' => '#/components/schemas/user'
+
+        let!(:user) { User.create(name: 'Alice') }
+        let(:id) { user.id }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data['name']).to eq('Alice')
+          expect(response.content_type).to eq('application/json; charset=utf-8')
+        end
+      end
+
+      response '404', 'user not exists' do
+        schema '$ref' => '#/components/schemas/errors'
+
+        let(:id) { 'non-existing' }
+
+        run_test! do |response|
+          expect(response.status).to eq(404)
+        end
+      end
+    end
+
     delete 'Deletes a user' do
       tags 'Users'
       produces 'application/json'
@@ -89,13 +117,13 @@ RSpec.describe 'API::V1::Users', type: :request do
         end
       end
 
-      response '404', 'user not found' do
+      response '404', 'user not exists' do
         schema '$ref' => '#/components/schemas/errors'
 
         let(:id) { 'non-existing' }
 
         run_test! do |response|
-            expect(response.status).to eq(404)
+          expect(response.status).to eq(404)
         end
       end
     end

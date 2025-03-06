@@ -50,6 +50,23 @@ paths:
       required: true
       schema:
         type: integer
+    get:
+      summary: Retrieve a user
+      tags:
+      - Users
+      responses:
+        '200':
+          description: user exists
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/user"
+        '404':
+          description: user not exists
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors"
     delete:
       summary: Deletes a user
       tags:
@@ -58,7 +75,7 @@ paths:
         '204':
           description: user deleted
         '404':
-          description: user not found
+          description: user not exists
           content:
             application/json:
               schema:

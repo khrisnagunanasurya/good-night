@@ -4,6 +4,11 @@ class Api::V1::UsersController < ApplicationController
     render json: User.all
   end
 
+  # GET api/v1/users/:id
+  def show
+    render json: User.find(params[:id])
+  end
+
   # POST api/v1/users
   def create
     user =  User.new(permitted_params)
