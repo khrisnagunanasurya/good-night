@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :users, only: %i[index show create destroy] do
         post :sleep, to: "users/sleep_records#sleep"
+        post :wake_up, to: "users/sleep_records#wake_up"
 
         resources :relationships, param: :target_user_id, only: %i[create destroy], module: :users, controller: :relationships
       end

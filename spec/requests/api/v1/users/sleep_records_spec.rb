@@ -46,4 +46,60 @@ RSpec.describe 'Api::V1::Users::SleepRecordsController', type: :request do
       end
     end
   end
+
+  path '/api/v1/users/{user_id}/wake_up' do
+    parameter name: :user_id, in: :path, type: :integer, description: 'ID of the user'
+
+    post 'Updates a wake-up record' do
+      tags 'SleepRecords'
+      consumes 'application/json'
+      produces 'application/json'
+
+      response '201', 'wake up record created successfully' do
+        let!(:user) { create(:user) }
+        let!(:sleep_record) { create(:sleep_record, user: user, sleep_at: 2.hours.ago, wake_up_at: nil) }
+        let(:user_id) { user.id }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(response).to have_http_status(:created)
+          expect(data['message']).to eq('Wake up record created successfully')
+          expect(sleep_record.reload.wake_up_at).to be_present
+        end
+      end
+
+      response '404', 'user not found' do
+        let(:user_id) { -1 }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(response).to have_http_status(:not_found)
+          expect(data['error']['message']).to eq('Not found')
+        end
+      end
+
+      response '422', 'user has no ongoing sleep record' do
+        let!(:user) { create(:user) }
+        let(:user_id) { user.id }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(data['error']['message']).to eq("You haven't sleep yet")
+        end
+      end
+
+      response '422', 'wake up already recorded' do
+        let!(:user) { create(:user) }
+        let!(:sleep_record) { create(:sleep_record, user: user, sleep_at: 3.hours.ago, wake_up_at: 1.hour.ago) }
+        let(:user_id) { user.id }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(data['error']['message']).to eq('You haven\'t sleep yet')
+        end
+      end
+    end
+  end
 end

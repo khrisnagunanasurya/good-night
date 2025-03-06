@@ -65,6 +65,44 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/errors"
+  "/api/v1/users/{user_id}/sleep":
+    parameters:
+    - name: user_id
+      in: path
+      description: ID of the user
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Creates a sleep record
+      tags:
+      - SleepRecords
+      responses:
+        '201':
+          description: sleep record created successfully
+        '404':
+          description: user not found
+        '422':
+          description: user already has an ongoing sleep record
+  "/api/v1/users/{user_id}/wake_up":
+    parameters:
+    - name: user_id
+      in: path
+      description: ID of the user
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Updates a wake-up record
+      tags:
+      - SleepRecords
+      responses:
+        '201':
+          description: wake up record created successfully
+        '404':
+          description: user not found
+        '422':
+          description: wake up already recorded
   "/api/v1/users":
     get:
       summary: Retrieves a list of users
