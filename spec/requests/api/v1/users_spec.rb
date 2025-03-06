@@ -1,4 +1,3 @@
-# spec/requests/api/v1/users_spec.rb
 require 'swagger_helper'
 
 RSpec.describe 'API::V1::Users', type: :request do
@@ -11,14 +10,14 @@ RSpec.describe 'API::V1::Users', type: :request do
         schema type: :array,
                items: { '$ref' => '#/components/schemas/user' }
 
-        let!(:user1) { User.create(name: 'Alice') }
-        let!(:user2) { User.create(name: 'Bob') }
+        let!(:user1) { create(:user) }
+        let!(:user2) { create(:user) }
 
         run_test! do |response|
           data = JSON.parse(response.body)
           expect(data.length).to eq(2)
-          expect(data[0]['name']).to eq('Alice')
-          expect(data[1]['name']).to eq('Bob')
+          expect(data[0]['name']).to eq(user1.name)
+          expect(data[1]['name']).to eq(user2.name)
           expect(response.content_type).to eq('application/json; charset=utf-8')
         end
 
@@ -44,13 +43,13 @@ RSpec.describe 'API::V1::Users', type: :request do
       response '201', 'user created' do
         schema '$ref' => '#/components/schemas/user'
 
-        let(:user) { { name: 'Charlie' } }
+        let(:user) { { name: Faker::Name.name } }
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['name']).to eq('Charlie')
+          expect(data['name']).to eq(user[:name])
           expect(User.count).to eq(1)
-          expect(User.last.name).to eq('Charlie')
+          expect(User.last.name).to eq(user[:name])
           expect(response.content_type).to eq('application/json; charset=utf-8')
         end
       end
@@ -62,7 +61,7 @@ RSpec.describe 'API::V1::Users', type: :request do
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(response.status).to eq(422)
+          expect(response).to have_http_status(:unprocessable_entity)
           expect(data['error']['details']).to include('name')
           expect(data['error']['details']['name']).to include("can't be blank")
           expect(User.count).to eq(0)
@@ -81,12 +80,12 @@ RSpec.describe 'API::V1::Users', type: :request do
       response '200', 'user exists' do
         schema '$ref' => '#/components/schemas/user'
 
-        let!(:user) { User.create(name: 'Alice') }
+        let!(:user) { create(:user) }
         let(:id) { user.id }
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['name']).to eq('Alice')
+          expect(data['name']).to eq(user.name)
           expect(response.content_type).to eq('application/json; charset=utf-8')
         end
       end
@@ -97,7 +96,7 @@ RSpec.describe 'API::V1::Users', type: :request do
         let(:id) { 'non-existing' }
 
         run_test! do |response|
-          expect(response.status).to eq(404)
+          expect(response).to have_http_status(:not_found)
         end
       end
     end
@@ -107,11 +106,11 @@ RSpec.describe 'API::V1::Users', type: :request do
       produces 'application/json'
 
       response '204', 'user deleted' do
-        let!(:user) { User.create(name: 'David') }
+        let!(:user) { create(:user) }
         let(:id) { user.id }
 
         run_test! do |response|
-          expect(response.status).to eq(204)
+          expect(response).to have_http_status(:no_content)
           expect(response.body).to be_empty
           expect(User.exists?(user.id)).to be_falsey
         end
@@ -123,7 +122,7 @@ RSpec.describe 'API::V1::Users', type: :request do
         let(:id) { 'non-existing' }
 
         run_test! do |response|
-          expect(response.status).to eq(404)
+          expect(response).to have_http_status(:not_found)
         end
       end
     end
