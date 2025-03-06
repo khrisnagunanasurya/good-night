@@ -59,8 +59,7 @@ group :test do
 end
 
 group :development do
-  gem "rswag-ui", "~> 2.13"
 end
 
+gem "rswag-ui", "~> 2.13"
 gem "rswag-api", "~> 2.13"
-
