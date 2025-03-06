@@ -18,16 +18,64 @@ RSpec.configure do |config|
     'v1/swagger.yaml' => {
       openapi: '3.0.1',
       info: {
-        title: 'API V1',
-        version: 'v1'
+        title: 'Good Night API',
+        version: 'v1',
+        description: 'API for tracking sleep records'
       },
       paths: {},
-      servers: [
+      components: {
+        schemas: {
+          user: {
+            type: :object,
+            properties: {
+              id: { type: :integer, example: 1 },
+              name: { type: :string, example: 'Alice' },
+              created_at: { type: :string, format: 'date-time', example: '2023-10-26T10:00:00Z' },
+              updated_at: { type: :string, format: 'date-time', example: '2023-10-26T10:00:00Z' }
+            },
+            required: ['id', 'name', 'created_at', 'updated_at']
+          },
+          user_create: {
+            type: :object,
+            properties: {
+              name: { type: :string, example: 'Charlie' }
+            },
+            required: ['name']
+          },
+          errors: {
+            type: :object,
+            properties: {
+              error: {
+                type: :object,
+                properties: {
+                  status: { type: :integer, example: 422, description: 'HTTP status code' },
+                  message: { type: :string, example: 'Failed to create a user', description: 'General error message' },
+                  details: {
+                    type: :object,
+                    description: 'Detailed error messages, keyed by attribute',
+                    additionalProperties: {
+                      type: :array,
+                      items: {
+                        type: :string,
+                        example: "can't be blank"
+                      },
+                      description: 'Array of error messages for a specific attribute'
+                    }
+                  }
+                },
+                required: ['status', 'message', 'details']
+              }
+            },
+            required: ['error']
+          }
+        }
+      },
+        servers: [
         {
-          url: 'https://{defaultHost}',
+          url: 'http://{defaultHost}',
           variables: {
             defaultHost: {
-              default: 'www.example.com'
+              default: 'localhost:3000'
             }
           }
         }

@@ -1,0 +1,131 @@
+---
+openapi: 3.0.1
+info:
+  title: Good Night API
+  version: v1
+  description: API for tracking sleep records
+paths:
+  "/api/v1/users":
+    get:
+      summary: Retrieves a list of users
+      tags:
+      - Users
+      responses:
+        '200':
+          description: users found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/user"
+    post:
+      summary: Creates a user
+      tags:
+      - Users
+      parameters: []
+      responses:
+        '201':
+          description: user created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/user"
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/user_create"
+  "/api/v1/users/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: User ID
+      required: true
+      schema:
+        type: integer
+    delete:
+      summary: Deletes a user
+      tags:
+      - Users
+      responses:
+        '204':
+          description: user deleted
+        '404':
+          description: user not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors"
+components:
+  schemas:
+    user:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Alice
+        created_at:
+          type: string
+          format: date-time
+          example: '2023-10-26T10:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2023-10-26T10:00:00Z'
+      required:
+      - id
+      - name
+      - created_at
+      - updated_at
+    user_create:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Charlie
+      required:
+      - name
+    errors:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 422
+              description: HTTP status code
+            message:
+              type: string
+              example: Failed to create a user
+              description: General error message
+            details:
+              type: object
+              description: Detailed error messages, keyed by attribute
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+                  example: can't be blank
+                description: Array of error messages for a specific attribute
+          required:
+          - status
+          - message
+          - details
+      required:
+      - error
+servers:
+- url: http://{defaultHost}
+  variables:
+    defaultHost:
+      default: localhost:3000
