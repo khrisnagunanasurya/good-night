@@ -49,7 +49,7 @@ RSpec.configure do |config|
                 type: :object,
                 properties: {
                   status: { type: :integer, example: 422, description: 'HTTP status code' },
-                  message: { type: :string, example: 'Failed to create a user', description: 'General error message' },
+                  message: { type: :string, example: 'This is error message', description: 'General error message' },
                   details: {
                     type: :object,
                     description: 'Detailed error messages, keyed by attribute',

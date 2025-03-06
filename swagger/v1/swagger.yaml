@@ -5,6 +5,39 @@ info:
   version: v1
   description: API for tracking sleep records
 paths:
+  "/api/v1/users/{user_id}/relationships":
+    parameters:
+    - name: user_id
+      in: path
+      description: ID of the user who is following
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Follows a user
+      tags:
+      - Relationships
+      parameters: []
+      responses:
+        '201':
+          description: user followed successfully
+        '422':
+          description: can't follow yourself
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                followed_user_id:
+                  type: integer
+                  description: ID of the user to be followed
+              required:
+              - followed_user_id
   "/api/v1/users":
     get:
       summary: Retrieves a list of users
@@ -124,7 +157,7 @@ components:
               description: HTTP status code
             message:
               type: string
-              example: Failed to create a user
+              example: This is error message
               description: General error message
             details:
               type: object

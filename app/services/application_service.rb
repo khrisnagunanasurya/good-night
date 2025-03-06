@@ -1,4 +1,6 @@
 class ApplicationService
+  class Error < StandardError; end
+
   attr_reader :success, :error_message, :error_details
 
   def self.call(*args, **kwargs)
@@ -21,7 +23,7 @@ class ApplicationService
         @error_message = e.record.errors.full_messages.join(', ')
         @error_details = e.record.errors
         raise ActiveRecord::Rollback
-      rescue StandardError => e
+      rescue Error, StandardError => e
         @error_message = e.message
         raise ActiveRecord::Rollback
       end
