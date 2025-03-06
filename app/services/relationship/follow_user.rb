@@ -10,7 +10,6 @@ class Relationship::FollowUser < ApplicationService
 
   private
 
-
   def execute
     raise ArgumentError, 'Invalid follower or followed user.' unless valid_input?
 
@@ -22,6 +21,6 @@ class Relationship::FollowUser < ApplicationService
   end
 
   def valid_input?
-    follower.is_a?(User) && followed_user.is_a?(User) && follower.present? && followed_user.present?
+    follower.is_a?(User) && followed_user.is_a?(User) && follower.persisted? && followed_user.persisted?
   end
 end

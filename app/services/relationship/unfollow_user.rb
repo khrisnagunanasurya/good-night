@@ -10,7 +10,6 @@ class Relationship::UnfollowUser < ApplicationService
 
   private
 
-
   def execute
     raise ArgumentError, 'Invalid unfollower or unfollowed user.' unless valid_input?
 
