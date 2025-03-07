@@ -18,6 +18,11 @@ RSpec.describe 'Api::V1::Users::RelationshipsController', type: :request do
       }
 
       response '201', 'user followed successfully' do
+        schema type: :object,
+               properties: {
+                 data: { '$ref' => '#/components/schemas/relationship' }
+               }
+
         let!(:user) { create(:user) }
         let(:user_id) { user.id }
 
@@ -25,9 +30,10 @@ RSpec.describe 'Api::V1::Users::RelationshipsController', type: :request do
         let(:relationship) { { target_user_id: followed_user.id } }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
+          json = JSON.parse(response.body)
           expect(response).to have_http_status(:created)
-          expect(data['message']).to eq('User followed successfully')
+          expect(json['data']['follower_id']).to eq user_id
+          expect(json['data']['followed_user_id']).to eq followed_user.id
         end
       end
 

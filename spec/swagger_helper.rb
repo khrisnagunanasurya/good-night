@@ -47,6 +47,16 @@ RSpec.configure do |config|
             },
             required: ['id', 'name', 'created_at', 'updated_at']
           },
+          relationship: {
+            type: :object,
+            properties: {
+              id: { type: :integer, example: 1 },
+              follower_id: { type: :integer, example: 123 },
+              followed_user_id: { type: :integer, example: 456 },
+              created_at: { type: :string, format: :date_time, example: "2025-03-07T13:57:23.796Z" },
+              updated_at: { type: :string, format: :date_time, example: "2025-03-07T13:57:23.796Z" }
+            }
+          },
           user_create: {
             type: :object,
             properties: {

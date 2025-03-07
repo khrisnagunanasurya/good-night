@@ -7,7 +7,7 @@ class Api::V1::Users::RelationshipsController < ApplicationController
     service = Relationship::FollowUser.call(follower: @user, followed_user: @target_user)
 
     if service.success?
-      render json: { message: 'User followed successfully' }, status: :created
+      render json: { data: service.result }, status: :created
     else
       render_error(:unprocessable_content, service.error_message, service.error_details)
     end
