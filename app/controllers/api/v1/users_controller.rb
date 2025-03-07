@@ -5,17 +5,17 @@ class Api::V1::UsersController < ApplicationController
   def feed
     service = SleepRecord::Feed.call(user: User.find(params[:user_id]))
 
-    render json: service.result
+    render json: paginate(service.result)
   end
 
   # GET api/v1/users
   def index
-    render json: User.all
+    render json: paginate(User.all)
   end
 
   # GET api/v1/users/:id
   def show
-    render json: User.find(params[:id])
+    render json: { data: User.find(params[:id]) }
   end
 
   # POST api/v1/users

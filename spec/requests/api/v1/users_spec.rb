@@ -3,14 +3,25 @@ require 'swagger_helper'
 RSpec.describe 'API::V1::Users', type: :request do
   path '/api/v1/users/{user_id}/feed' do
     parameter name: :user_id, in: :path, type: :integer, description: 'User ID'
+    parameter name: :page, in: :query, type: :integer, description: 'Page number'
+    parameter name: :per_page, in: :query, type: :integer, description: 'Records per page'
+
+    let(:page) { 1 }
+    let(:per_page) { 10 }
 
     get 'Retrieves user sleep feed' do
       tags 'Users'
       produces 'application/json'
 
       response '200', 'feed found' do
-        schema type: :array,
-               items: { '$ref' => '#/components/schemas/sleep_record' }
+        schema type: :object,
+               properties: {
+                 data: {
+                   type: :array,
+                   items: { '$ref' => '#/components/schemas/sleep_record' }
+                 },
+                 pagination: { '$ref' => '#/components/schemas/pagination' }
+               }
 
         let!(:user) { create(:user) }
         let!(:followed_user) { create(:user) }
@@ -20,23 +31,29 @@ RSpec.describe 'API::V1::Users', type: :request do
         let(:user_id) { user.id }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data.length).to eq(2)
-          expect(data[0]['id']).to eq(sleep_record2.id)
-          expect(data[1]['id']).to eq(sleep_record1.id)
+          json = JSON.parse(response.body)
+          expect(json['data'].size).to eq(2)
+          expect(json['data'][0]['id']).to eq(sleep_record2.id)
+          expect(json['data'][1]['id']).to eq(sleep_record1.id)
+          expect(json['pagination']['current_page']).to eq(1)
           expect(response.content_type).to eq('application/json; charset=utf-8')
         end
       end
 
       response '200', 'user has no sleep records' do
-        schema type: :array, items: {}
+        schema type: :object,
+               properties: {
+                 data: { type: :array, items: {} },
+                 pagination: { '$ref' => '#/components/schemas/pagination' }
+               }
 
         let!(:user) { create(:user) }
         let(:user_id) { user.id }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data).to eq([])
+          json = JSON.parse(response.body)
+          expect(json['data']).to eq([])
+          expect(json['pagination']['total_count']).to eq(0)
           expect(response.content_type).to eq('application/json; charset=utf-8')
         end
       end
@@ -59,26 +76,34 @@ RSpec.describe 'API::V1::Users', type: :request do
       produces 'application/json'
 
       response '200', 'users found' do
-        schema type: :array,
-               items: { '$ref' => '#/components/schemas/user' }
+        schema type: :object,
+               properties: {
+                 data: {
+                   type: :array,
+                   items: { '$ref' => '#/components/schemas/user' }
+                 },
+                 pagination: { '$ref' => '#/components/schemas/pagination' }
+               }
 
         let!(:user1) { create(:user) }
         let!(:user2) { create(:user) }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data.length).to eq(2)
-          expect(data[0]['name']).to eq(user1.name)
-          expect(data[1]['name']).to eq(user2.name)
+          json = JSON.parse(response.body)
+          expect(json['data'].length).to eq(2)
+          expect(json['data'][0]['name']).to eq(user1.name)
+          expect(json['data'][1]['name']).to eq(user2.name)
+          expect(json['pagination']['current_page']).to eq(1)
           expect(response.content_type).to eq('application/json; charset=utf-8')
         end
 
         context 'when there are no users' do
           let!(:user1) {}
           let!(:user2) {}
+
           run_test! do |response|
             data = JSON.parse(response.body)
-            expect(data.length).to eq(0)
+            expect(data['data'].length).to eq(0)
           end
         end
       end
@@ -130,14 +155,16 @@ RSpec.describe 'API::V1::Users', type: :request do
       produces 'application/json'
 
       response '200', 'user exists' do
-        schema '$ref' => '#/components/schemas/user'
+        schema type: :object, properties: {
+          data: { '$ref' => '#/components/schemas/user' }
+        }
 
         let!(:user) { create(:user) }
         let(:id) { user.id }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['name']).to eq(user.name)
+          json = JSON.parse(response.body)
+          expect(json['data']['name']).to eq(user.name)
           expect(response.content_type).to eq('application/json; charset=utf-8')
         end
       end

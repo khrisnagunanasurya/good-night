@@ -138,6 +138,16 @@ paths:
       required: true
       schema:
         type: integer
+    - name: page
+      in: query
+      description: Page number
+      schema:
+        type: integer
+    - name: per_page
+      in: query
+      description: Records per page
+      schema:
+        type: integer
     get:
       summary: Retrieves user sleep feed
       tags:
@@ -164,36 +174,18 @@ paths:
       - Users
       responses:
         '200':
-          description: users found
+          description: no users found
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  "$ref": "#/components/schemas/user"
-    post:
-      summary: Creates a user
-      tags:
-      - Users
-      parameters: []
-      responses:
-        '201':
-          description: user created
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/user"
-        '422':
-          description: invalid request
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/errors"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/user_create"
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/user"
+                  pagination:
+                    "$ref": "#/components/schemas/pagination"
   "/api/v1/users/{id}":
     parameters:
     - name: id
@@ -212,20 +204,10 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/user"
-        '404':
-          description: user not exists
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/errors"
-    delete:
-      summary: Deletes a user
-      tags:
-      - Users
-      responses:
-        '204':
-          description: user deleted
+                type: object
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/user"
         '404':
           description: user not exists
           content:
@@ -234,6 +216,34 @@ paths:
                 "$ref": "#/components/schemas/errors"
 components:
   schemas:
+    pagination:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          example: 1
+        prev_page_url:
+          type: string
+          nullable: true
+          example:
+        prev_page:
+          type: integer
+          nullable: true
+          example:
+        next_page_url:
+          type: string
+          nullable: true
+          example:
+        next_page:
+          type: integer
+          nullable: true
+          example:
+        total_pages:
+          type: integer
+          example: 10
+        total_count:
+          type: integer
+          example: 100
     user:
       type: object
       properties:
