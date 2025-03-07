@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       resources :users, only: %i[index show create destroy] do
         get :feed, to: 'users#feed'
 
+        get :sleep_records, to: 'users/sleep_records#index'
         post :sleep, to: 'users/sleep_records#sleep'
         post :wake_up, to: 'users/sleep_records#wake_up'
 

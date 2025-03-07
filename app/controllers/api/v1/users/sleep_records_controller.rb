@@ -1,6 +1,11 @@
 class Api::V1::Users::SleepRecordsController < ApplicationController
   before_action :set_user
 
+  # GET /api/v1/users/:user_id/sleep_records
+  def index
+    render json: @user.sleep_records
+  end
+
   # POST /api/v1/users/:user_id/sleep
   def sleep
     service = SleepRecord::Sleep.call(user: @user)

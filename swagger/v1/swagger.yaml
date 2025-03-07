@@ -65,6 +65,33 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/errors"
+  "/api/v1/users/{user_id}/sleep_records":
+    parameters:
+    - name: user_id
+      in: path
+      description: User ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieves a user’s sleep records
+      tags:
+      - Sleep Records
+      responses:
+        '200':
+          description: no sleep records found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/sleep_record"
+        '404':
+          description: user not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors"
   "/api/v1/users/{user_id}/sleep":
     parameters:
     - name: user_id

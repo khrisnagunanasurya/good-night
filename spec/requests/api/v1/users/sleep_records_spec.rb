@@ -1,6 +1,52 @@
 require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Users::SleepRecordsController', type: :request do
+  path '/api/v1/users/{user_id}/sleep_records' do
+    parameter name: :user_id, in: :path, type: :integer, description: 'User ID'
+
+    get 'Retrieves a user’s sleep records' do
+      tags 'Sleep Records'
+      produces 'application/json'
+
+      response '200', 'sleep records found' do
+        schema type: :array, items: { '$ref' => '#/components/schemas/sleep_record' }
+
+        let!(:user) { create(:user) }
+        let!(:sleep_record1) { create(:sleep_record, user: user, duration: 36000, sleep_at: 2.days.ago, wake_up_at: 1.day.ago) }
+        let!(:sleep_record2) { create(:sleep_record, user: user, duration: 28800, sleep_at: 1.hour.ago) }
+        let(:user_id) { user.id }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data.length).to eq(2)
+          expect(data[0]['duration']).to eq(sleep_record1.duration)
+          expect(data[1]['duration']).to eq(sleep_record2.duration)
+          expect(response.content_type).to eq('application/json; charset=utf-8')
+        end
+      end
+
+      response '200', 'no sleep records found' do
+        let!(:user) { create(:user) }
+        let(:user_id) { user.id }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data).to eq([])
+        end
+      end
+
+      response '404', 'user not found' do
+        schema '$ref' => '#/components/schemas/errors'
+
+        let(:user_id) { -1 }
+
+        run_test! do |response|
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+  end
+
   path '/api/v1/users/{user_id}/sleep' do
     parameter name: :user_id, in: :path, type: :integer, description: 'ID of the user'
 
