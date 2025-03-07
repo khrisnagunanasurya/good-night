@@ -42,6 +42,17 @@ RSpec.configure do |config|
             },
             required: ['name']
           },
+          sleep_record: {
+            type: :object,
+            properties: {
+              id: { type: :integer, example: 101 },
+              user_id: { type: :integer, example: 1 },
+              duration: { type: :integer, example: 36000, description: 'Duration of sleep in seconds' },
+              created_at: { type: :string, format: 'date-time', example: '2024-03-06T22:00:00Z' },
+              updated_at: { type: :string, format: 'date-time', example: '2024-03-06T22:00:00Z' }
+            },
+            required: %w[id user_id duration created_at updated_at]
+          },
           errors: {
             type: :object,
             properties: {

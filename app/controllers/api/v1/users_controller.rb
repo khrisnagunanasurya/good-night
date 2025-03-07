@@ -1,4 +1,13 @@
 class Api::V1::UsersController < ApplicationController
+  # GET api/v1/users/:id/feed
+  # Actually I prefer to make this api/v1/feeds, but as I dont implement authorization here,
+  # so to make it more easy to get the users feeds, I made it this way
+  def feed
+    service = SleepRecord::Feed.call(user: User.find(params[:user_id]))
+
+    render json: service.result
+  end
+
   # GET api/v1/users
   def index
     render json: User.all

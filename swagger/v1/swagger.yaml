@@ -103,6 +103,33 @@ paths:
           description: user not found
         '422':
           description: wake up already recorded
+  "/api/v1/users/{user_id}/feed":
+    parameters:
+    - name: user_id
+      in: path
+      description: User ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieves user sleep feed
+      tags:
+      - Users
+      responses:
+        '200':
+          description: user has no sleep records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/sleep_record"
+        '404':
+          description: user not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors"
   "/api/v1/users":
     get:
       summary: Retrieves a list of users
@@ -210,6 +237,33 @@ components:
           example: Charlie
       required:
       - name
+    sleep_record:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 101
+        user_id:
+          type: integer
+          example: 1
+        duration:
+          type: integer
+          example: 36000
+          description: Duration of sleep in seconds
+        created_at:
+          type: string
+          format: date-time
+          example: '2024-03-06T22:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2024-03-06T22:00:00Z'
+      required:
+      - id
+      - user_id
+      - duration
+      - created_at
+      - updated_at
     errors:
       type: object
       properties:
