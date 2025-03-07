@@ -1,7 +1,7 @@
 class ApplicationService
   class Error < StandardError; end
 
-  attr_reader :success, :error_message, :error_details
+  attr_reader :success, :result, :error_message, :error_details
 
   def self.call(*args, **kwargs)
     new(*args, **kwargs).call
@@ -16,7 +16,7 @@ class ApplicationService
   def call
     ActiveRecord::Base.transaction do
       begin
-        execute
+        @result = execute
 
         @success = true
       rescue ActiveRecord::RecordInvalid => e
