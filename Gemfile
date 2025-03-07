@@ -65,3 +65,5 @@ end
 
 gem "rswag-ui", "~> 2.13"
 gem "rswag-api", "~> 2.13"
+
+gem "kaminari", "~> 1.2"
