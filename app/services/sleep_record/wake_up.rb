@@ -11,16 +11,12 @@ class SleepRecord::WakeUp < ApplicationService
   private
 
   def execute
-    raise ArgumentError, 'Invalid user.' unless valid_user?
+    raise ArgumentError, 'Invalid user.' unless valid_user?(user)
 
     last_record = user.sleep_records.last
 
     raise Error, 'You haven\'t sleep yet' if last_record.nil? || last_record.wake_up_at.present?
 
     last_record.update!(wake_up_at: wake_up_at)
-  end
-
-  def valid_user?
-    user.is_a?(User) && user.persisted?
   end
 end

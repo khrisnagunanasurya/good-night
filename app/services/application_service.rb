@@ -41,4 +41,8 @@ class ApplicationService
   def execute
     raise NotImplementedError, "You must implement the #{self.class}##{__method__} method"
   end
+
+  def valid_user?(actor)
+    actor.is_a?(User) && actor.persisted?
+  end
 end

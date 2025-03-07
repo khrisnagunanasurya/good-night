@@ -11,7 +11,7 @@ class SleepRecord::Sleep < ApplicationService
   private
 
   def execute
-    raise ArgumentError, 'Invalid user.' unless valid_user?
+    raise ArgumentError, 'Invalid user.' unless valid_user?(user)
 
     user.with_lock do
       last_record = user.sleep_records.last
@@ -20,9 +20,5 @@ class SleepRecord::Sleep < ApplicationService
 
       SleepRecord.create!(user: user, sleep_at: sleep_at)
     end
-  end
-
-  def valid_user?
-    user.is_a?(User) && user.persisted?
   end
 end
