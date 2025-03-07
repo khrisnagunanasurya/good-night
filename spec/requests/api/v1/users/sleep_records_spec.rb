@@ -78,13 +78,19 @@ RSpec.describe 'Api::V1::Users::SleepRecordsController', type: :request do
       produces 'application/json'
 
       response '201', 'sleep record created successfully' do
+        schema type: :object,
+               properties: {
+                 data: { '$ref' => '#/components/schemas/sleep_record' }
+               }
+
         let!(:user) { create(:user) }
         let(:user_id) { user.id }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
+          json = JSON.parse(response.body)
           expect(response).to have_http_status(:created)
-          expect(data['message']).to eq('Sleep record created successfully')
+          expect(json['data']['sleep_at']).not_to be_nil
+          expect(json['data']['wake_up_at']).to be_nil
         end
       end
 
@@ -123,16 +129,22 @@ RSpec.describe 'Api::V1::Users::SleepRecordsController', type: :request do
       consumes 'application/json'
       produces 'application/json'
 
-      response '201', 'wake up record created successfully' do
+      response '200', 'wake up record created successfully' do
+        schema type: :object,
+               properties: {
+                 data: { '$ref' => '#/components/schemas/sleep_record' }
+               }
+
         let!(:user) { create(:user) }
         let!(:sleep_record) { create(:sleep_record, user: user, sleep_at: 2.hours.ago, wake_up_at: nil) }
         let(:user_id) { user.id }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(response).to have_http_status(:created)
-          expect(data['message']).to eq('Wake up record created successfully')
-          expect(sleep_record.reload.wake_up_at).to be_present
+          json = JSON.parse(response.body)
+          expect(response).to have_http_status(:ok)
+          expect(json['data']['sleep_at']).not_to be_nil
+          expect(json['data']['wake_up_at']).not_to be_nil
+          expect(json['data']['duration']).not_to eq 0
         end
       end
 

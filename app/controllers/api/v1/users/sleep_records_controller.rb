@@ -11,7 +11,7 @@ class Api::V1::Users::SleepRecordsController < ApplicationController
     service = SleepRecord::Sleep.call(user: @user)
 
     if service.success?
-      render json: { message: 'Sleep record created successfully' }, status: :created
+      render json: { data: service.result }, status: :created
     else
       render_error(:unprocessable_content, service.error_message, service.error_details)
     end
@@ -22,7 +22,7 @@ class Api::V1::Users::SleepRecordsController < ApplicationController
     service = SleepRecord::WakeUp.call(user: @user)
 
     if service.success?
-      render json: { message: 'Wake up record created successfully' }, status: :created
+      render json: { data: service.result }, status: :ok
     else
       render_error(:unprocessable_content, service.error_message, service.error_details)
     end

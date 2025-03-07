@@ -18,5 +18,6 @@ class SleepRecord::WakeUp < ApplicationService
     raise Error, 'You haven\'t sleep yet' if last_record.nil? || last_record.wake_up_at.present?
 
     last_record.update!(wake_up_at: wake_up_at)
+    last_record
   end
 end
