@@ -21,6 +21,13 @@ paths:
       responses:
         '201':
           description: user followed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/relationship"
         '422':
           description: can't follow yourself
           content:
@@ -124,6 +131,13 @@ paths:
       responses:
         '201':
           description: sleep record created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/sleep_record"
         '404':
           description: user not found
         '422':
@@ -141,8 +155,15 @@ paths:
       tags:
       - Sleep Records
       responses:
-        '201':
+        '200':
           description: wake up record created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/sleep_record"
         '404':
           description: user not found
         '422':
@@ -324,6 +345,26 @@ components:
       - name
       - created_at
       - updated_at
+    relationship:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        follower_id:
+          type: integer
+          example: 123
+        followed_user_id:
+          type: integer
+          example: 456
+        created_at:
+          type: string
+          format: date_time
+          example: '2025-03-07T13:57:23.796Z'
+        updated_at:
+          type: string
+          format: date_time
+          example: '2025-03-07T13:57:23.796Z'
     user_create:
       type: object
       properties:
