@@ -25,6 +25,18 @@ RSpec.configure do |config|
       paths: {},
       components: {
         schemas: {
+          pagination: {
+            type: :object,
+            properties: {
+              current_page: { type: :integer, example: 1 },
+              prev_page_url: { type: :string, nullable: true, example: nil },
+              prev_page: { type: :integer, nullable: true, example: nil },
+              next_page_url: { type: :string, nullable: true, example: nil },
+              next_page: { type: :integer, nullable: true, example: nil },
+              total_pages: { type: :integer, example: 10 },
+              total_count: { type: :integer, example: 100 }
+            }
+          },
           user: {
             type: :object,
             properties: {

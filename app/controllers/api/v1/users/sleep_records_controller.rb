@@ -3,7 +3,7 @@ class Api::V1::Users::SleepRecordsController < ApplicationController
 
   # GET /api/v1/users/:user_id/sleep_records
   def index
-    render json: @user.sleep_records
+    render json: paginate(@user.sleep_records)
   end
 
   # POST /api/v1/users/:user_id/sleep

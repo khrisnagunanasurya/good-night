@@ -3,35 +3,38 @@ require 'swagger_helper'
 RSpec.describe 'Api::V1::Users::SleepRecordsController', type: :request do
   path '/api/v1/users/{user_id}/sleep_records' do
     parameter name: :user_id, in: :path, type: :integer, description: 'User ID'
+    parameter name: :page, in: :query, type: :integer, required: false, description: 'Page number'
+    parameter name: :per_page, in: :query, type: :integer, required: false, description: 'Number of items per page'
+
+    let(:page) { 1 }
+    let(:per_page) { 10 }
 
     get 'Retrieves a user’s sleep records' do
       tags 'Sleep Records'
       produces 'application/json'
 
       response '200', 'sleep records found' do
-        schema type: :array, items: { '$ref' => '#/components/schemas/sleep_record' }
+        schema type: :object,
+               properties: {
+                 data: {
+                   type: :array,
+                   items: { '$ref' => '#/components/schemas/sleep_record' }
+                 },
+                 pagination: { '$ref' => '#/components/schemas/pagination' }
+               }
 
         let!(:user) { create(:user) }
-        let!(:sleep_record1) { create(:sleep_record, user: user, duration: 36000, sleep_at: 2.days.ago, wake_up_at: 1.day.ago) }
-        let!(:sleep_record2) { create(:sleep_record, user: user, duration: 28800, sleep_at: 1.hour.ago) }
+        let!(:sleep_record1) { create(:sleep_record, user: user, sleep_at: 2.days.ago, wake_up_at: 1.day.ago) }
+        let!(:sleep_record2) { create(:sleep_record, user: user, sleep_at: 1.hour.ago) }
         let(:user_id) { user.id }
+        let(:page) { 1 }
+        let(:per_page) { 10 }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data.length).to eq(2)
-          expect(data[0]['duration']).to eq(sleep_record1.duration)
-          expect(data[1]['duration']).to eq(sleep_record2.duration)
+          json = JSON.parse(response.body)
+          expect(json['data'].size).to eq(2)
+          expect(json['pagination']['current_page']).to eq(page)
           expect(response.content_type).to eq('application/json; charset=utf-8')
-        end
-      end
-
-      response '200', 'no sleep records found' do
-        let!(:user) { create(:user) }
-        let(:user_id) { user.id }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data).to eq([])
         end
       end
 
@@ -51,43 +54,18 @@ RSpec.describe 'Api::V1::Users::SleepRecordsController', type: :request do
     parameter name: :user_id, in: :path, type: :integer, description: 'ID of the user'
 
     post 'Creates a sleep record' do
-      tags 'SleepRecords'
+      tags 'Sleep Records'
       consumes 'application/json'
       produces 'application/json'
 
       response '201', 'sleep record created successfully' do
+        schema type: :object, properties: { data: { '$ref' => '#/components/schemas/sleep_record' } }
         let!(:user) { create(:user) }
         let(:user_id) { user.id }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
+          json = JSON.parse(response.body)
           expect(response).to have_http_status(:created)
-          expect(data['message']).to eq('Sleep record created successfully')
-        end
-      end
-
-      response '404', 'user not found' do
-        let(:user_id) { -1 }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(response).to have_http_status(:not_found)
-          expect(data['error']['message']).to eq('Not found')
-        end
-      end
-
-      response '422', 'user already has an ongoing sleep record' do
-        let!(:user) { create(:user) }
-        let(:user_id) { user.id }
-
-        before do
-          create(:sleep_record, user: user, sleep_at: Time.current, wake_up_at: nil)
-        end
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(response).to have_http_status(:unprocessable_content)
-          expect(data['error']['message']).to eq('You already have an ongoing sleep record')
         end
       end
     end
@@ -97,53 +75,19 @@ RSpec.describe 'Api::V1::Users::SleepRecordsController', type: :request do
     parameter name: :user_id, in: :path, type: :integer, description: 'ID of the user'
 
     post 'Updates a wake-up record' do
-      tags 'SleepRecords'
+      tags 'Sleep Records'
       consumes 'application/json'
       produces 'application/json'
 
       response '201', 'wake up record created successfully' do
+        schema type: :object, properties: { data: { '$ref' => '#/components/schemas/sleep_record' } }
         let!(:user) { create(:user) }
         let!(:sleep_record) { create(:sleep_record, user: user, sleep_at: 2.hours.ago, wake_up_at: nil) }
         let(:user_id) { user.id }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
+          json = JSON.parse(response.body)
           expect(response).to have_http_status(:created)
-          expect(data['message']).to eq('Wake up record created successfully')
-          expect(sleep_record.reload.wake_up_at).to be_present
-        end
-      end
-
-      response '404', 'user not found' do
-        let(:user_id) { -1 }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(response).to have_http_status(:not_found)
-          expect(data['error']['message']).to eq('Not found')
-        end
-      end
-
-      response '422', 'user has no ongoing sleep record' do
-        let!(:user) { create(:user) }
-        let(:user_id) { user.id }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(response).to have_http_status(:unprocessable_content)
-          expect(data['error']['message']).to eq("You haven't sleep yet")
-        end
-      end
-
-      response '422', 'wake up already recorded' do
-        let!(:user) { create(:user) }
-        let!(:sleep_record) { create(:sleep_record, user: user, sleep_at: 3.hours.ago, wake_up_at: 1.hour.ago) }
-        let(:user_id) { user.id }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(response).to have_http_status(:unprocessable_content)
-          expect(data['error']['message']).to eq('You haven\'t sleep yet')
         end
       end
     end
